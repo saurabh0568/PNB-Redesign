@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PNB Net Banking - Secure Access</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+</head>
+<body>
+    <!-- Session Expiration Overlay -->
+    <div id="session-expired-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <i data-lucide="alert-circle" style="width: 80px; height: 80px; color: #800000; margin-bottom: 2rem;"></i>
+            <h1 style="font-family: 'Outfit', sans-serif; color: #800000; font-size: 2.5rem;">Session Expired</h1>
+            <p style="font-size: 1.2rem; color: #64748b; margin-bottom: 2rem;">Your secure session has timed out for your safety. Please try again.</p>
+            <button onclick="location.reload()" class="btn-primary">Try Again</button>
+        </div>
+    </div>
+
+    <header class="pnb-header">
+        <img src="logo.png" alt="PNB Logo" class="header-logo">
+        <h1>Punjab National Bank</h1>
+    </header>
+
+    <nav class="pnb-nav">
+        <ul>
+            <li class="active-nav">Dashboard</li>
+            <li>Manage Account</li>
+            <li>Transactions</li>
+            <li>Investment</li>
+            <li>Cards & Loans</li>
+            <li>Other Services</li>
+            <li>Govt & Tax</li>
+            <li>Personal Settings</li>
+        </ul>
+    </nav>
+
+    <div class="timer-container">
+        <div class="progress-bar-bg">
+            <div id="progress-bar" class="progress-bar-fill"></div>
+        </div>
+        <div class="timer-text">
+            <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
+            <span id="session-timer">05:00</span> Minutes Pending
+        </div>
+    </div>
+
+    <main id="screen-container">
+        <!-- Screen 1: Dashboard -->
+        <section id="dashboard" class="screen active">
+            <div class="dashboard-layout">
+                <aside class="shortcuts-sidebar">
+                    <h3>Your Shortcuts</h3>
+                    <ul class="shortcut-list">
+                        <li><i data-lucide="lock"></i> Change Login Password</li>
+                        <li><i data-lucide="shield-check"></i> Change Transcation Password</li>
+                        <li><i data-lucide="wallet"></i> Check Account Balance</li>
+                        <li><i data-lucide="send"></i> Transfer Money</li>
+                        <li><i data-lucide="settings-2"></i> Set Limits</li>
+                        <li class="clickable" id="btn-pay-bills"><i data-lucide="receipt"></i> Pay Bills</li>
+                        <li class="clickable" id="btn-spend-analyzer"><i data-lucide="pie-chart"></i> Spend Analyzer</li>
+                    </ul>
+                </aside>
+
+                <div class="main-content-area">
+                    <h2 class="welcome-text">Welcome Saurabh,</h2>
+                    <h3 class="banking-title">PNB Net Banking</h3>
+                    
+                    <div class="schemes-grid">
+                        <div class="scheme-box">
+                            <img src="scheme1.png" alt="Savings Scheme" class="scheme-img">
+                            <div class="scheme-content">
+                                <h4>Savings Schemes</h4>
+                                <p>Secure your future with high-interest savings and fixed deposit plans tailored for you.</p>
+                                <div class="learn-more">Learn More <i data-lucide="chevron-right"></i></div>
+                            </div>
+                        </div>
+                        <div class="scheme-box">
+                            <img src="scheme2.png" alt="Loan Scheme" class="scheme-img">
+                            <div class="scheme-content">
+                                <h4>Loan Schemes</h4>
+                                <p>Low-interest home, car, and personal loans with quick approval and flexible EMI options.</p>
+                                <div class="learn-more">Learn More <i data-lucide="chevron-right"></i></div>
+                            </div>
+                        </div>
+                        <div class="scheme-box">
+                            <img src="scheme3.png" alt="Investment Scheme" class="scheme-img">
+                            <div class="scheme-content">
+                                <h4>Investment Schemes</h4>
+                                <p>Grow your wealth with mutual funds, gold bonds, and government-backed tax-saving schemes.</p>
+                                <div class="learn-more">Learn More <i data-lucide="chevron-right"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen 2: Spend Analyzer -->
+        <section id="spend-analyzer" class="screen">
+            <div class="dashboard-layout">
+                <aside class="shortcuts-sidebar">
+                    <h3>Your Shortcuts</h3>
+                    <ul class="shortcut-list">
+                        <li><i data-lucide="lock"></i> Change Login Password</li>
+                        <li><i data-lucide="shield-check"></i> Change Transcation Password</li>
+                        <li><i data-lucide="wallet"></i> Check Account Balance</li>
+                        <li><i data-lucide="send"></i> Transfer Money</li>
+                        <li><i data-lucide="settings-2"></i> Set Limits</li>
+                        <li class="clickable" onclick="showScreen('pay-bills')"><i data-lucide="receipt"></i> Pay Bills</li>
+                        <li class="clickable" onclick="showScreen('spend-analyzer')"><i data-lucide="pie-chart"></i> Spend Analyzer</li>
+                    </ul>
+                </aside>
+
+                <div class="main-content-area">
+                    <h2 class="analyzer-title">Spend Analyzer</h2>
+                    
+                    <div class="analyzer-main-flex">
+                        <div class="chart-container">
+                            <canvas id="spendDonutChart"></canvas>
+                        </div>
+                        
+                        <div class="analyzer-legend">
+                            <div class="legend-item">
+                                <div class="color-square" style="background-color: #d32f2f;"></div>
+                                <span class="legend-label">Fund Transfer</span>
+                                <span class="legend-amount">Rs. 2400</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="color-square" style="background-color: #1976d2;"></div>
+                                <span class="legend-label">Lifestyle</span>
+                                <span class="legend-amount">Rs. 800</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="color-square" style="background-color: #388e3c;"></div>
+                                <span class="legend-label">Shopping</span>
+                                <span class="legend-amount">Rs. 420</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="all-details-container">
+                        <div class="dropdown-details">
+                            <div class="dropdown-header">
+                                <span>Fund Transfer &nbsp; Rs. 2400</span>
+                                <i data-lucide="chevron-down"></i>
+                            </div>
+                            <div class="dropdown-content">
+                                <div class="detail-line"><span>Saurabh:</span> <span>Rs. 1200</span></div>
+                                <div class="detail-line"><span>Tanya:</span> <span>Rs. 800</span></div>
+                                <div class="detail-line"><span>Harsh:</span> <span>Rs. 400</span></div>
+                            </div>
+                        </div>
+
+                        <div class="dropdown-details">
+                            <div class="dropdown-header">
+                                <span>Lifestyle &nbsp; Rs. 800</span>
+                                <i data-lucide="chevron-down"></i>
+                            </div>
+                            <div class="dropdown-content">
+                                <div class="detail-line"><span>Movies:</span> <span>Rs. 300</span></div>
+                                <div class="detail-line"><span>Dinner:</span> <span>Rs. 350</span></div>
+                                <div class="detail-line"><span>Gym:</span> <span>Rs. 150</span></div>
+                            </div>
+                        </div>
+
+                        <div class="dropdown-details">
+                            <div class="dropdown-header">
+                                <span>Shopping &nbsp; Rs. 420</span>
+                                <i data-lucide="chevron-down"></i>
+                            </div>
+                            <div class="dropdown-content">
+                                <div class="detail-line"><span>Amazon:</span> <span>Rs. 220</span></div>
+                                <div class="detail-line"><span>Groceries:</span> <span>Rs. 200</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen 3: Pay Bills (Placeholder for 3rd screen/4th image) -->
+        <section id="pay-bills" class="screen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="showScreen('dashboard')">
+                    <i data-lucide="arrow-left"></i> Back
+                </button>
+                <h2>Pay Bills</h2>
+            </div>
+            <div class="bill-category-grid">
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="tag"></i></div><span>Fastag</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="smartphone"></i></div><span>Mobile Postpaid</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="zap"></i></div><span>Electricity</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="flame"></i></div><span>Gas</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="fuel"></i></div><span>LPG Gas</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="droplets"></i></div><span>Water</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="banknote"></i></div><span>Loan Repayment</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="phone"></i></div><span>Landline Postpaid</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="router"></i></div><span>Broadband Postpaid</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="shield"></i></div><span>Insurance</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="building-2"></i></div><span>Housing Society</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="graduation-cap"></i></div><span>Education Fees</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="landmark"></i></div><span>Municipal Taxes</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="monitor"></i></div><span>Cable TV</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="satellite-dish"></i></div><span>DTH</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="hospital"></i></div><span>Hospital</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="map-pin"></i></div><span>Municipal Services</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="tv"></i></div><span>Subscription</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="credit-card"></i></div><span>Credit Card</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="piggy-bank"></i></div><span>Recurring Deposit</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="microscope"></i></div><span>Hospital and Pathology</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="users"></i></div><span>Clubs and Associations</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="phone-call"></i></div><span>Mobile Prepaid</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="key"></i></div><span>Rental</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="heart-pulse"></i></div><span>Health Insurance</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="shield-check"></i></div><span>Life Insurance</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="gauge"></i></div><span>Prepaid Meter</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="wallet"></i></div><span>NCMC Recharge</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="heart"></i></div><span>Donation</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="file-text"></i></div><span>eChallan</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="user-check"></i></div><span>Agent Collection</span></div>
+                <div class="bill-icon-card"><div class="icon-box"><i data-lucide="plug-zap"></i></div><span>EV Recharge</span></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Tour Elements -->
+    <div id="tour-overlay" class="tour-overlay hidden"></div>
+    <div id="tour-tooltip" class="tour-tooltip hidden">
+        <div class="tooltip-arrow"></div>
+        <div class="tooltip-content">
+            <h4 id="tour-title">Title</h4>
+            <p id="tour-text">Description goes here.</p>
+        </div>
+        <div class="tooltip-footer">
+            <div class="tour-nav-btns" style="width: 100%; justify-content: flex-end;">
+                <button id="tour-next" class="btn-primary-small">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
